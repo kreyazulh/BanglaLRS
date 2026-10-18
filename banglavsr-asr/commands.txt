@@ -1,0 +1,39 @@
+//extraction (data)
+
+pip uninstall -y onnxruntime
+pip install -U ml_dtypes
+
+
+export LD_LIBRARY_PATH=$(python -c "import nvidia,glob,os;print(':'.join(glob.glob(os.path.join(nvidia.__path__[0],'*','lib'))))")
+
+echo $LD_LIBRARY_PATH      # should contain .../nvidia/cudnn/lib
+
+//video to clips, audio
+
+python run.py --url "https://www.youtube.com/playlist?list=PLSCEFWKIs8Cq8jmUr3kH3H2BTbnbHmmCu" --out data --delete-raw
+
+//audio to text (in banglavsr-asr)
+python transcribe.py --clips /home/tigerit/Documents/banglavsr-data/data/clips --out /home/tigerit/Documents/banglavsr-data/data/transcripts_bn.jsonl
+
+
+//roi prep
+
+python data_prep.py --transcripts /home/tigerit/Documents/banglavsr-data/data/transcripts_bn.jsonl --out_manifest m.jsonl --out_vocab vocab.json
+
+
+python build_roi.py --manifest m.jsonl --clips_dir /home/tigerit/Documents/banglavsr-data/data/clips --roi_dir data/roi --mean_face ./20words_mean_face.npy --out_manifest m_roi.jsonl
+
+python split.py --manifest m_roi.jsonl --clips_dir /home/tigerit/Documents/banglavsr-data/data/clips --out_dir data/splits --threshold 0.5
+
+
+
+
+//avr-model
+
+python build_bn_tokens.py --manifests data/splits/train.jsonl data/splits/val.jsonl data/splits/test.jsonl --out bn_tokens.json
+
+
+python bn_train.py --train-file data/splits/train.jsonl --val-file data/splits/val.jsonl     --token-list bn_tokens.json --pretrained-model-path vsr_trlrs3_base.pth     --freeze-encoder --max-frames 800 --precision bf16-mixed
+
+python bn_decode.py --ckpt exp_bn/last-v1.ckpt --manifest data/splits/val.jsonl \
+    --token-list bn_tokens.json --beam-size 20 --limit 20

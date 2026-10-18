@@ -1,0 +1,39 @@
+# BanglaVSR data pipeline config. All values have code defaults; override here.
+
+# ingest
+max_height: 720
+sub_lang: bn
+
+# detection / tracking
+frame_stride: 2          # set 2 to roughly halve the detection pass time
+det_score_min: 0.55
+iou_thresh: 0.45
+track_max_age: 8
+track_min_len: 8
+
+# quality gates
+min_face_frac: 0.06      # face height must be >= 6% of frame height
+frontal_min: 0.55
+asd_motion_win: 7
+
+# active speaker (heuristic) - TUNE asd_motion_ref on one hand-checked clip
+asd_motion_ref: 0.008
+vad_aggressiveness: 2
+
+# span extraction
+asd_high: 0.55
+asd_low: 0.35
+smooth_k: 5
+merge_gap_sec: 0.20
+min_span_sec: 0.8
+max_span_sec: 4
+
+# anchor identity
+id_sim_thresh: 0.50
+
+# export
+crop_margin: 0.4
+crop_size: 224
+
+min_active_frac: 0.7   # fraction of a voiced run the anchor's lips must move
+span_pad_sec: 0.05     # small padding so onset/offset consonants aren't clipped
