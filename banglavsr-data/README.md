@@ -88,4 +88,3 @@ does not change. Select it with `--asd lightasd`.
   not the .vtt timestamps, for training labels.
 - Plan to release the pipeline plus video IDs and timestamps rather than the
   videos themselves.
-```
