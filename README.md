@@ -4,6 +4,10 @@ This repository contains the code, configuration files, and metadata required to
 
 Each component has its own dependencies. Install the corresponding `requirements.txt` files and use separate virtual environments to avoid dependency conflicts.
 
+<p align="center">
+  <img src="pipeline.png" alt="BanglaLRS pipeline" width="100%">
+</p>
+
 ## Folder Layout
 
 - `banglavsr-data/`: video extraction and transcript generation
